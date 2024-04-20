@@ -28,6 +28,16 @@ def send_salary_email(request, nguoild_id):
     return HttpResponseRedirect(reverse("admin:Payroll_nguoild_changelist"))
     # return HttpResponseRedirect(reverse("admin:index"))
     
-def import_excel(request):
-    # Xử lý import Excel ở đây
-    return render(request, 'admin/app_nguoild/import_excel.html')
+from .forms import ImportNguoiLDForm
+def import_nguoild(request):
+    print(request.method)
+    if request.method == 'POST':
+        form = ImportNguoiLDForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'File đã được import thành công')
+            return HttpResponseRedirect(reverse("admin:Payroll_nguoild_changelist"))
+    else:
+        form = ImportNguoiLDForm()
+    return render(request, 'admin/import_nguoild_form.html', {'form': form})
+

@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+{{ block.super }}
+<div>
+    <form action='/api/ICD10/disease/export' method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p><input type="submit" value="Xuất dữ liệu dạng Excel" class="btn btn-primary" ></p>
+    </form>
+    <form action='/api/ICD10/disease/export' method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p><input type="submit" value="Nhập dữ liệu dạng Excel" class="btn btn-primary" ></p>
+    </form>
+</div>
+{% endblock %}

@@ -1,5 +1,4 @@
 from django.db import models
-from num2words import num2words
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
 import pandas as pd
@@ -329,3 +328,12 @@ class NguoiLD(models.Model):
         except:
             return None
     bang_luong.short_description = 'Bảng Lương'
+
+
+
+class ImportNguoiLD(models.Model):
+
+    class Meta:
+        verbose_name_plural = 'Import Người Lao Động'
+        verbose_name = 'Import Người Lao Động'
+    pass

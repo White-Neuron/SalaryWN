@@ -177,7 +177,7 @@ class NguoiLDAdmin(ImportMixin, admin.ModelAdmin):
     #     return format_html('<a class="button" href="{}">Send Email</a>', send_url)
     # send_buttom.allow_tags = True
     # send_buttom.short_description = 'Select Project to Send Email'
-
+    change_list_template = 'admin/nguoild_change_list.html'
     list_display = ['mnv', 'cap', 'loaihd', 'songay', '_luong', 'send_button']
     readonly_fields = ["_luong", 'quyetdinh', 'luong', 'luong_in_words', 'bang_luong']
     list_filter = ['quyetdinh']
@@ -213,10 +213,30 @@ class NguoiLDAdmin(ImportMixin, admin.ModelAdmin):
 
     # def send_email_actions(self, request, queryset):
 
+from .forms import ImportNguoiLDForm 
+from django.contrib import messages
+class ImportNguoiLDAdmin(admin.ModelAdmin):
+    change_list_template= 'admin/import_nguoild_change_list.html'
+
+    def has_add_permission(self, request):
+        return False
+    
+    def changelist_view(self, *args, **kwargs):
+        view = super().changelist_view(*args, **kwargs)
+        view.context_data['submit_form'] = ImportNguoiLDForm()
+        self.message_user(
+            args[0],
+            args[0].session.get('message', ''),
+            level= messages.ERROR if args[0].session.get('status', '') == 'error' else messages.SUCCESS,
+        )
+        # view.context_data['message']= args[0].session.get('message', '')
+        return view
+    pass 
 
 
 
 
+admin.site.register(ImportNguoiLD, ImportNguoiLDAdmin)
 admin.site.register(CapBac, CapBacAdmin)
 admin.site.register(QuyetDinh, QuyetDinhAdmin)
 admin.site.register(HeSoLuong, HeSoLuongAdmin)
