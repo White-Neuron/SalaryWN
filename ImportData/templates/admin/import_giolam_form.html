@@ -1,0 +1,6 @@
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.file }}
+    {{ form.field_mapping }}
+    <button type="submit">Import</button>
+</form> 
