@@ -25,17 +25,19 @@ from django.apps import apps
 
 
 class QuyetDinhTangBac(models.Model):
-    mnv = models.ForeignKey('Payroll.NguoiLD', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Mã nhân viên')
+    mnv = models.ForeignKey('Payroll.NguoiLD', on_delete=models.CASCADE, null=True, blank=True, verbose_name='Mã nhân viên')
     date = models.DateField(null=True, blank=True, verbose_name='Ngày quyết định')
     bac_cu = models.ForeignKey('Payroll.HeSoLuong', on_delete=models.SET_NULL, null=True, blank=True, related_name='bac_cu_quyetdinh_set', verbose_name='Bậc cũ')
     bac_moi = models.ForeignKey('Payroll.HeSoLuong', on_delete=models.SET_NULL, null=True, blank=True, related_name='bac_moi_quyetdinh_set', verbose_name='Bậc mới')
 
     def save(self, *args, **kwargs):
         nguoild_model = apps.get_model('Payroll', 'NguoiLD')
-        nguoild = nguoild_model.objects.filter(mnv=self.mnv).first()
+        nguoild = nguoild_model.objects.filter(mnv=self.mnv).last()
+        print(nguoild.thang)
         self.bac_cu = nguoild.cap
         nguoild.cap = self.bac_moi
         nguoild.save()
+        
         super(QuyetDinhTangBac, self).save(*args, **kwargs)
     class Meta:
         verbose_name_plural = 'Quyết Định Tăng Bậc'

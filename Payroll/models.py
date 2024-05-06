@@ -144,8 +144,9 @@ class NguoiLD(models.Model):
             try:
                 self.quyetdinh = QuyetDinhLuong.objects.get(month=self.thang)
             except:
-                self.quyetdinh = QuyetDinhLuong.objects.filter().first()
-        if self.cap:       
+                self.quyetdinh = QuyetDinhLuong.objects.filter().last()
+                print(self.quyetdinh)
+        if self.cap and self.quyetdinh:       
             if self.loaihd == 'Thực tập sinh':
                 hsluong = HeSoLuong.objects.filter(loaibac=self.cap.loaibac, bac = self.cap.bac).first()
                 hsluong.manhour = 1200000 / 8 / 8
@@ -167,6 +168,15 @@ class NguoiLD(models.Model):
                 if self.chucvu:
                     self.luong += self.chucvu.thuong
             self.luong = int (round(self.luong, -4))
+
+            # try:
+            #     try:
+            #         bl = BangLuong.objects.get(mnv = self.mnv, month = self.thang)
+            #     except:
+            #         bl = BangLuong(mnv = self, month = self.thang)
+            #         bl.save()
+            # except:
+            #     return ValidationError("Không có")
             # print(self.luong) 
         # if not self.cap and self.loaihd == 'Thực tập sinh':
         #     self.luong = 1200000
@@ -292,7 +302,6 @@ class NguoiLD(models.Model):
 
     def bang_luong(self):
         try:
-        # Tạo DataFrame từ dữ liệu lương
             data = {
                 "Thông tin": ["Mã Nhân Viên", "Cấp", "Hệ số Lương theo cấp", 
                               "Lương cơ sở", "Loại hoạt động", 
@@ -303,7 +312,6 @@ class NguoiLD(models.Model):
             }
             df = pd.DataFrame(data)
 
-            # Vẽ bảng lương
             html_table = df.to_html(index=False, header=True, classes='table table-striped', border=2)
 
             return html_table
@@ -312,3 +320,40 @@ class NguoiLD(models.Model):
     bang_luong.short_description = 'Bảng Lương'
 
 
+class BangLuong(models.Model):
+    mnv = models.ForeignKey(NguoiLD, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Mã nhân viên')
+    THANG_CHOICE=[
+        (1, 1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12,12),
+    ]
+    month = models.IntegerField(choices=THANG_CHOICE, null=True, blank=True, verbose_name='Lương tháng')
+    qdluong = models.ForeignKey(QuyetDinhLuong, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Quyết định lương')
+    qdbac = models.ForeignKey(QuyetDinhTangBac, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Quyết định tăng bậc')
+
+    class Meta:
+        verbose_name_plural = 'Bảng Lương'
+
+
+    def __str__(self):
+        return str(self.mnv)
+
+    def save(self, *args, **kwargs):
+        try:
+            self.qdluong = QuyetDinhLuong.objects.filter().last()
+        except:
+            return None
+        try:
+            self.qdbac = QuyetDinhTangBac.objects.filter(mnv = self.mnv).first()
+        except:
+            return None
+        super(BangLuong, self).save(*args, **kwargs)
+        pass  
+
+
+    def bang_luong(self):
+        try:
+            nguoild = NguoiLD.objects.filter(mnv = self.mnv, thang = self.month).first()
+            bangluong = nguoild.bang_luong()
+            return format_html(bangluong)
+        except:
+            return None
+    bang_luong.short_description = 'Bảng lương'

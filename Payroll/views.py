@@ -5,12 +5,15 @@ from .models import NguoiLD
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.shortcuts import render
-
+from django.core.exceptions import ValidationError
 def send_salary_email(request, nguoild_id):
     try:
         nguoild = NguoiLD.objects.get(id=nguoild_id)
-        
-        salary_table = nguoild.bang_luong()
+        print(nguoild.luong)
+        if nguoild.luong is None:
+            raise ValidationError("Người lao động chưa có lương")
+        else:
+            salary_table = nguoild.bang_luong()
         
         subject = 'Bảng lương'
         from_email = 'hostt4569@gmail.com'  

@@ -88,14 +88,14 @@ class NguoiLDResource(resources.ModelResource):
 class NguoiLDAdmin(admin.ModelAdmin):
     resource_class = NguoiLDResource
     list_display = ['mnv','name', 'cap', 'chucvu', 'loaihd', 'sogio', '_luong', 'send_button']
-    readonly_fields = ['_cap','sogio','loaihd', "_luong", 'quyetdinh', 'luong', 'luong_in_words', 'bang_luong']
+    readonly_fields = ['_cap','sogio','loaihd', "_luong", 'quyetdinh', 'luong']
     list_filter = ['quyetdinh', 'thang']
     fieldsets= (
         ("Thông tin cơ bản", {
             "fields": ["mnv","name", "email", "chucvu"]
         }),
         ("Thông tin lương", {
-            "fields": ["_cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong", "luong_in_words"]
+            "fields": ["_cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong"]
         })
     )
     actions = ['send_email']
@@ -122,7 +122,25 @@ class NguoiLDAdmin(admin.ModelAdmin):
 
     # def send_email_actions(self, request, queryset):
 
+class BangLuongAdmin(admin.ModelAdmin):
+    change_form_template = 'admin/nguoild_change_form.html'
+    list_display = ['mnv', 'month']
+    readonly_fields = ['qdluong', 'qdbac','bang_luong']
+    list_filter = ['mnv', 'month']
+    fieldsets= (
+        ("Thông tin lương", {
+            "fields": ["mnv", "month", "qdluong", "qdbac", "bang_luong"]
+        }),
+    )
+    # fieldsets= (
+    #     (
+    #         None, {
+    #         # "classes": ["collapse"],
+    #         "fields": ['__str__', 'qd', 'hsltheocap', 'muctang', '_luongcoso']
+    #     }),
+    # )
 
+admin.site.register(BangLuong, BangLuongAdmin)
 
 class GioLamAmin(admin.ModelAdmin):
     list_filter = ['mnv', 'thang']
@@ -130,8 +148,8 @@ class GioLamAmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
-    def has_delete_permission(self, request):
-        return False
+    # def has_delete_permission(self, request):
+    #     return False
 
 admin.site.register(ChucVu, ChucVuAdmin)
 admin.site.register(GioLam, GioLamAmin)
