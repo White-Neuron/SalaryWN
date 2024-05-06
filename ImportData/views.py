@@ -17,7 +17,7 @@ def import_nguoild(request):
             imported_data = pd.read_excel(file)
             
             for index, row in imported_data.iterrows():
-                chucvu = ChucVu.objects.get(kh=row[4])
+                chucvu = ChucVu.objects.filter(kh=row[4]).first()
                 print(chucvu)
                 nguoild = NguoiLD(
                     mnv=row[0], 
