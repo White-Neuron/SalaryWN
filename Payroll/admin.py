@@ -88,14 +88,14 @@ class NguoiLDResource(resources.ModelResource):
 class NguoiLDAdmin(admin.ModelAdmin):
     resource_class = NguoiLDResource
     list_display = ['mnv','name', 'cap', 'chucvu', 'loaihd', 'sogio', '_luong', 'send_button']
-    readonly_fields = ['cap','sogio','loaihd', "_luong", 'quyetdinh', 'luong', 'luong_in_words', 'bang_luong']
+    readonly_fields = ['_cap','sogio','loaihd', "_luong", 'quyetdinh', 'luong', 'luong_in_words', 'bang_luong']
     list_filter = ['quyetdinh', 'thang']
     fieldsets= (
         ("Thông tin cơ bản", {
             "fields": ["mnv","name", "email", "chucvu"]
         }),
         ("Thông tin lương", {
-            "fields": ["cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong", "luong_in_words"]
+            "fields": ["_cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong", "luong_in_words"]
         })
     )
     actions = ['send_email']

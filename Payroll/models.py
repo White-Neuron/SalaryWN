@@ -123,7 +123,7 @@ class NguoiLD(models.Model):
     mnv = models.CharField(max_length=10, verbose_name='MNV')
     email = models.EmailField(null=True, blank=True)
     name = models.CharField(max_length=50, verbose_name='Tên', null=True, blank=True)
-    cap = models.ForeignKey(HeSoLuong, on_delete=models.DO_NOTHING, verbose_name='Cấp bậc', null=True, blank=True)
+    cap = models.ForeignKey(HeSoLuong, on_delete=models.SET_NULL, verbose_name='Cấp bậc', null=True, blank=True)
     HD_CHOICE=[
         ('Toàn thời gian', 'Toàn thời gian'),
         ('Bán thời gian', 'Bán thời gian'),
@@ -181,9 +181,22 @@ class NguoiLD(models.Model):
     def __str__(self):
         return str(self.mnv)
     
+    def _cap(self):
+        # qd = QuyetDinhTangBac.objects.filter(mnv = self.mnv, bac_moi = self.cap).first()
+        # print(qd)
+        try:
+            qd = QuyetDinhTangBac.objects.filter(mnv = self, bac_moi = self.cap).first()
+            # print(qd.date)
+            # print(qd)
+            s = str(self.cap) + " (" + str(qd) + ")"
+            return s 
+        except:
+            return str(self.cap) + " (" + ")"
+    _cap.short_description = 'Cấp bậc'
         
     def _luong(self):
         try:
+            # print(self.luong)
             return "{:,.0f} đồng".format(self.luong)
         except:
             return None
@@ -281,11 +294,11 @@ class NguoiLD(models.Model):
         try:
         # Tạo DataFrame từ dữ liệu lương
             data = {
-                "Thông tin": ["Mã Nhân Viên", "Cấp", "Hệ số Lương theo cấp", "Lương cơ sở", 
-                             "Lương cơ sở theo giờ", "Loại hoạt động", 
+                "Thông tin": ["Mã Nhân Viên", "Cấp", "Hệ số Lương theo cấp", 
+                              "Lương cơ sở", "Loại hoạt động", 
                             "Số giờ làm việc", "Tổng lương", "Bằng chữ"],
-                "Giá trị": [self.mnv, self.cap, self.cap.hsltheocap, self._luongcoso(), 
-                            self._giangaycong(), self.loaihd, 
+                "Giá trị": [self.mnv, self.cap, self.cap.hsltheocap, 
+                            self._luongcoso(), self.loaihd, 
                             self.sogio, self._luong(), self.luong_in_words()]
             }
             df = pd.DataFrame(data)
