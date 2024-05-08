@@ -19,14 +19,22 @@ def import_nguoild(request):
             for index, row in imported_data.iterrows():
                 chucvu = ChucVu.objects.filter(kh=row[4]).first()
                 print(chucvu)
-                nguoild = NguoiLD(
-                    mnv=row[0], 
-                    name=row[2],
-                    email=row[3], 
-                    chucvu=chucvu,
-                    loaihd=row[9],
-                )
-                nguoild.save()
+                try: nguoild = NguoiLD.objects.get(
+                        mnv=row[0], 
+                        name=row[2],
+                        email=row[3], 
+                        chucvu=chucvu,
+                        loaihd=row[9],
+                    )
+                except:
+                    nguoild = NguoiLD(
+                        mnv=row[0], 
+                        name=row[2],
+                        email=row[3], 
+                        chucvu=chucvu,
+                        loaihd=row[9],
+                    )
+                    nguoild.save()
             
             messages.success(request, 'File đã được import thành công')
             return HttpResponseRedirect(reverse("admin:Payroll_nguoild_changelist"))
@@ -51,19 +59,18 @@ def import_giolam(request):
                 )
                 giolam.save()
                 
-                # Tìm tất cả các người lao động có mã nhân viên giống với mã nhân viên từ dữ liệu giờ làm
-                nguoild_list = NguoiLD.objects.filter(mnv=giolam.mnv)
+                nguoild = NguoiLD.objects.filter(mnv = giolam.mnv).first()
+                luong_list = BangLuong.objects.filter(mnv=nguoild)
                 time = datetime.strptime(str(giolam.sogio), '%H:%M:%S')
                 hours = time.hour + time.minute / 60 + time.second / 3600
             
-                # Cập nhật số giờ làm cho từng người lao động
-                for nguoild in nguoild_list:
+                for luong in luong_list:
                     # tong += hours
-                    if not nguoild.thang:
-                        nguoild.thang = giolam.thang
-                    if nguoild.thang == giolam.thang:
-                        nguoild.sogio += round(hours, 2)
-                        nguoild.save()
+                    if not luong.month:
+                        luong.month = giolam.thang
+                    if luong.month == giolam.thang:
+                        luong.sogio += round(hours, 2)
+                        luong.save()
             messages.success(request, 'File đã được import thành công')
             return HttpResponseRedirect(reverse("admin:Payroll_giolam_changelist"))
     else:

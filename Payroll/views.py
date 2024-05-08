@@ -1,19 +1,20 @@
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from .models import NguoiLD
+from .models import NguoiLD, BangLuong
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
-def send_salary_email(request, nguoild_id):
+def send_salary_email(request, bangluong_id):
     try:
-        nguoild = NguoiLD.objects.get(id=nguoild_id)
-        print(nguoild.luong)
-        if nguoild.luong is None:
+        bangluong = BangLuong.objects.get(id = bangluong_id)
+        nguoild = NguoiLD.objects.get(mnv=bangluong.mnv)
+        # print(nguoild.luong)
+        if bangluong.luong is None:
             raise ValidationError("Người lao động chưa có lương")
         else:
-            salary_table = nguoild.bang_luong()
+            salary_table = bangluong.bang_luong()
         
         subject = 'Bảng lương'
         from_email = 'hostt4569@gmail.com'  
@@ -26,8 +27,8 @@ def send_salary_email(request, nguoild_id):
         
         messages.success(request, 'Email đã được gửi thành công')
     except Exception as e:
-        messages.error(request, f"Có lỗi xảy ra: {str(e)}")
+        messages.error(request, f"Error: {str(e)}")
 
-    return HttpResponseRedirect(reverse("admin:Payroll_nguoild_changelist"))
+    return HttpResponseRedirect(reverse("admin:Payroll_bangluong_changelist"))
     # return HttpResponseRedirect(reverse("admin:index"))
     

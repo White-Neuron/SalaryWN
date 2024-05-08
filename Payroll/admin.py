@@ -17,60 +17,18 @@ import pandas as pd
 #     #TODO: inline 
 #     inlines = [HeSoLuongInLine]
 
-class CapBacInline(admin.TabularInline):
-    model = CapBac
+class BangLuongInLine(admin.TabularInline):
+    model = BangLuong
     extra = 0
-
-class HeSoLuongInLine(admin.TabularInline):
-    model = HeSoLuong
-    extra = 0
+    readonly_fields = ['bang_luong']
     fieldsets= (
         (
             None, {
-            # "classes": ["collapse"],
-            "fields": ['hsltheocap', 'loaibac','bac', 'muctang', '_luongcoso']
+            "fields" : ['bang_luong']
         }),
     )
-    readonly_fields = ['loaibac','bac', 'qd', 'muctang', '_luongcoso', 'luongcoso', 'manhour']
     can_delete = False
-    max_num=0
-    
-    
-class CapBacAdmin(admin.ModelAdmin):
-    readonly_fields = ['cb', 'name', 'qd']
-    list_display = ['cb','name', 'heso', 'qd']
-    list_filter = ['qd']
-    readonly_fields = ['cb', 'name', 'qd']
-    #TODO: inline 
-    inlines = [HeSoLuongInLine]
-
-class ChucVuInline(admin.TabularInline):
-    model = ChucVu
-    extra = 0
-
-class ChucVuAdmin(admin.ModelAdmin):
-    list_display = ['kh', 'name', 'thuong', 'qd']
-    list_filter = ['qd']
-
-
-    
-class HeSoLuongAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'hsltheocap','qd']
-    readonly_fields = ['__str__','qd','loaibac','bac','muctang', '_luongcoso', '_manhour']
-    list_filter = ['qd']
-    fieldsets= (
-        (
-            None, {
-            # "classes": ["collapse"],
-            "fields": ['__str__', 'qd', 'hsltheocap', 'muctang', '_luongcoso']
-        }),
-    )
-    def has_add_permission(self, request):
-        return False
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
+    max_num = 0
 
 class NguoiLDResource(resources.ModelResource):
     mnv = fields.Field(attribute='mnv', column_name='Mã nhân viên')
@@ -87,17 +45,31 @@ class NguoiLDResource(resources.ModelResource):
 
 class NguoiLDAdmin(admin.ModelAdmin):
     resource_class = NguoiLDResource
-    list_display = ['mnv','name', 'cap', 'chucvu', 'loaihd', 'sogio', '_luong', 'send_button']
-    readonly_fields = ['_cap','sogio','loaihd', "_luong", 'quyetdinh', 'luong']
-    list_filter = ['quyetdinh', 'thang']
+    list_display = ['mnv','name', 'chucvu', 'loaihd']
+    readonly_fields = ['loaihd', 'chucvu']
+    # list_filter = ['quyetdinh', 'thang']
     fieldsets= (
         ("Thông tin cơ bản", {
             "fields": ["mnv","name", "email", "chucvu"]
         }),
-        ("Thông tin lương", {
-            "fields": ["_cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong"]
-        })
+        # ("Thông tin lương", {
+        #     "fields": ["_cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong"]
+        # })
     )
+    inlines = [BangLuongInLine]
+
+
+class BangLuongAdmin(admin.ModelAdmin):
+    change_form_template = 'admin/nguoild_change_form.html'
+    list_display = ['mnv','cap','sogio', 'month', 'send_button']
+    readonly_fields = ['_cap','luong','qdluong', 'qdbac','bang_luong']
+    list_filter = ['mnv', 'month']
+    fieldsets= (
+        ("Thông tin lương", {
+            "fields": ["mnv",'_cap', "month", "qdluong", "qdbac", "bang_luong"]
+        }),
+    )
+    # inlines = [BangLuongInLine]
     actions = ['send_email']
 
     def send_email(self, request, queryset):
@@ -106,7 +78,7 @@ class NguoiLDAdmin(admin.ModelAdmin):
                 salary_table = obj.bang_luong()
                 subject = 'Bảng lương'
                 from_email = 'hostt4569@gmail.com'  
-                to_email = [obj.email]
+                to_email = [obj.mnv.email]
                 html = render_to_string('email_template.html', {'salary_table': salary_table})
                 send_mail(subject, '', from_email, to_email, html_message=html)
                 self.message_user(request, 'Email đã được gửi thành công')
@@ -120,26 +92,6 @@ class NguoiLDAdmin(admin.ModelAdmin):
     send_button.allow_tags = True
     send_button.short_description = 'Send Email'
 
-    # def send_email_actions(self, request, queryset):
-
-class BangLuongAdmin(admin.ModelAdmin):
-    change_form_template = 'admin/nguoild_change_form.html'
-    list_display = ['mnv', 'month']
-    readonly_fields = ['qdluong', 'qdbac','bang_luong']
-    list_filter = ['mnv', 'month']
-    fieldsets= (
-        ("Thông tin lương", {
-            "fields": ["mnv", "month", "qdluong", "qdbac", "bang_luong"]
-        }),
-    )
-    # fieldsets= (
-    #     (
-    #         None, {
-    #         # "classes": ["collapse"],
-    #         "fields": ['__str__', 'qd', 'hsltheocap', 'muctang', '_luongcoso']
-    #     }),
-    # )
-
 admin.site.register(BangLuong, BangLuongAdmin)
 
 class GioLamAmin(admin.ModelAdmin):
@@ -148,12 +100,8 @@ class GioLamAmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
-    # def has_delete_permission(self, request):
-    #     return False
+    def has_delete_permission(self, request):
+        return False
 
-admin.site.register(ChucVu, ChucVuAdmin)
 admin.site.register(GioLam, GioLamAmin)
-admin.site.register(CapBac, CapBacAdmin)
-
-admin.site.register(HeSoLuong, HeSoLuongAdmin)
 admin.site.register(NguoiLD, NguoiLDAdmin)
