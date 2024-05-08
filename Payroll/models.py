@@ -78,11 +78,12 @@ class BangLuong(models.Model):
     qdbac = models.ForeignKey(QuyetDinhTangBac, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Quyết định tăng bậc')
 
     class Meta:
-        verbose_name_plural = 'Bảng Lương'
+        verbose_name_plural = 'Thông Tin Lương'
 
 
     def __str__(self):
-        return str(self.mnv)
+        s = "THÁNG " + str(self.month)
+        return s
 
     def save(self, *args, **kwargs):
         try:
@@ -245,5 +246,5 @@ class BangLuong(models.Model):
             return format_html(html_table)
         except:
             return None
-    bang_luong.short_description = 'Bảng Lương'
+    bang_luong.short_description = 'Bảng Lương theo tháng' 
 

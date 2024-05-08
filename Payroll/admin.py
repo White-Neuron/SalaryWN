@@ -49,12 +49,13 @@ class NguoiLDAdmin(admin.ModelAdmin):
     readonly_fields = ['loaihd', 'chucvu']
     # list_filter = ['quyetdinh', 'thang']
     fieldsets= (
-        ("Thông tin cơ bản", {
+        ("Thông Tin Cơ Bản", {
             "fields": ["mnv","name", "email", "chucvu"]
         }),
-        # ("Thông tin lương", {
-        #     "fields": ["_cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong"]
-        # })
+        # ("Bảng Lương", {
+        #     # "fields": ["_cap", "loaihd", "sogio", "thang", "quyetdinh", "_luong"]
+        #     "fields" : [BangLuongInLine]
+        # }),
     )
     inlines = [BangLuongInLine]
 
@@ -97,6 +98,7 @@ admin.site.register(BangLuong, BangLuongAdmin)
 class GioLamAmin(admin.ModelAdmin):
     list_filter = ['mnv', 'thang']
     list_display = ['mnv', 'sogio','date', 'thang']
+    readonly_fields = ['mnv', 'thang','quyetdinh', 'sogio', 'date']
 
     def has_add_permission(self, request):
         return False
