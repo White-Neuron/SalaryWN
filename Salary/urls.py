@@ -27,7 +27,12 @@ urlpatterns = [
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
     ]
 
+from django.http import HttpResponseRedirect
+def home(request): # Redirect to admin page
+    return HttpResponseRedirect('/admin/')
+
 urlpatterns += [
+    path('', home),
     path('admin/Payroll/',include('Payroll.urls')),
     path('admin/ImportData/', include('ImportData.urls')),
     path('admin/', admin.site.urls),

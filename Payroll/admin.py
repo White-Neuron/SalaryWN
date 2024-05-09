@@ -11,6 +11,10 @@ from django.shortcuts import render
 from django.urls import reverse
 import pandas as pd
 
+# remove admin interface for these models 
+from admin_interface.models import Theme
+admin.site.unregister(Theme)
+
 # class CapBacAdmin(admin.ModelAdmin):
 #     list_display = ['cb','name', 'heso', 'qd']
 #     list_filter = ['qd']

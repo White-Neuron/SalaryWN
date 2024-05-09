@@ -5,14 +5,14 @@ from Payroll.models import *
 class ImportNhanVien(models.Model):
 
     class Meta:
-        verbose_name_plural = 'Import Người Lao Động'
-        verbose_name = 'Import Người Lao Động'
+        verbose_name_plural = 'Nhập dữ liệu Người Lao Động'
+        verbose_name = 'Nhập dữ liệu Người Lao Động'
     
 
 
 class ImportGio(models.Model):
     class Meta:
-        verbose_name_plural = 'Import Giờ Làm'
-        verbose_name = 'Import Giờ Làm'
+        verbose_name_plural = 'Nhập dữ liệu Giờ Làm'
+        verbose_name = 'Nhập dữ liệu Giờ Làm'
     
     
