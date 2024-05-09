@@ -11,7 +11,7 @@ class GioLam(models.Model):
     thang = models.IntegerField(choices=THANG_CHOICE, null=True, blank=True, verbose_name="Lương tháng")
     quyetdinh = models.ForeignKey(QuyetDinhLuong, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Quyết định tháng')
     mnv = models.CharField(max_length=10, null=True, blank=True, verbose_name='MNV')
-    sogio = models.TimeField(null=True, blank=True, verbose_name='Số giờ làm việc')
+    sogio = models.FloatField(null=True, blank=True, verbose_name='Số giờ làm việc')
     # sogio = models.FloatField(default=0.0, verbose_name='Số giờ làm việc', null=True, blank=True)
     date = models.DateField(null=True, blank=True, verbose_name='Ngày làm việc')
 

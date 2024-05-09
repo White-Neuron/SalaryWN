@@ -52,17 +52,29 @@ def import_giolam(request):
             file = request.FILES['file']
             imported_data = pd.read_excel(file)
             for index, row in imported_data.iterrows():
+                time_str = str(row[6])
+                # Kiểm tra nếu chuỗi bắt đầu bằng dấu trừ
+                if time_str.startswith('-'):
+                    # Loại bỏ dấu trừ và chuyển đổi thành số dương
+                    time_str = time_str[1:]  # Bỏ qua ký tự đầu tiên (dấu trừ)
+                    time = datetime.strptime(time_str, '%H:%M:%S')
+                    # Tính tổng số giờ
+                    hours = - (time.hour + time.minute / 60 + time.second / 3600)
+                else:
+                    # Trường hợp không có dấu trừ, xử lý bình thường
+                    time = datetime.strptime(time_str, '%H:%M:%S')
+                    hours = time.hour + time.minute / 60 + time.second / 3600
                 giolam = GioLam(
                     mnv = row[0],
-                    date = row[1],
-                    sogio = row[7],
+                    date = row[2],
+                    sogio = hours,
                 )
                 giolam.save()
                 
                 nguoild = NguoiLD.objects.filter(mnv = giolam.mnv).first()
                 luong_list = BangLuong.objects.filter(mnv=nguoild)
-                time = datetime.strptime(str(giolam.sogio), '%H:%M:%S')
-                hours = time.hour + time.minute / 60 + time.second / 3600
+                # time = datetime.strptime(str(giolam.sogio), '%H:%M:%S')
+                # hours = time.hour + time.minute / 60 + time.second / 3600
             
                 for luong in luong_list:
                     # tong += hours
