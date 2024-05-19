@@ -35,5 +35,6 @@ urlpatterns += [
     path('', home),
     path('admin/Payroll/',include('Payroll.urls')),
     path('admin/ImportData/', include('ImportData.urls')),
+    path('admin/DashBoard/', include('DashBoard.urls')),
     path('admin/', admin.site.urls),
 ]

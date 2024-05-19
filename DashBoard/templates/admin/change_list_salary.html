@@ -1,0 +1,33 @@
+
+    {% extends "admin/change_list.html" %} 
+    {% load static %} 
+    {% block extrastyle %}
+    {{block.super }}
+    <link rel="stylesheet" href="/static/white-neuron-tw.css" />
+    <link rel="stylesheet" href="/static/bootstrap-grid.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" />
+    
+    {% endblock extrastyle %} {% block content_title %}
+    <h1 class="header-title">Thống kê Lương của Nhân Viên</h1>
+    {% endblock %}
+    {% block content %}
+
+    <div class="main-content">
+        <div class="row gy-3">
+          <div class="col-md-12">
+            <div id="select-employee"> </div>
+            <div class="chart-module">
+              <p class="text-overview">Salary</p>
+              <div id="summary"></div>
+              <p class="text-overview">Salary All</p>
+              <canvas class="w-100" id="sumall"></canvas>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <script src="{% static '/Chartjs/dist/chart.3.9.1.js' %}"></script>
+    <script src="{% static '/Chartjs/dist/chartjs-plugin-datalabels.js' %}"></script>
+    <script src="{% static 'app.js' %}"></script>
+    {% endblock content %}
+

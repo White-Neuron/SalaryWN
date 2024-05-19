@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'admin_interface',
     'colorfield',
-
+    'DashBoard',
     'Payroll',
     'ImportData',
     'QuyetDinh',
