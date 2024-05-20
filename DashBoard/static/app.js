@@ -17,39 +17,6 @@ function shortenString(inputString) {
 }
 
 
-// fetch(`/admin/DashBoard/api/salary/chart_summary/sdd001/`)
-//     .then(response => response.json())
-//     .then(data => {
-//         console.log(data)
-//             new Chart(ctx_sum, {
-//                     // type: 'bar',
-//                 data: {
-//                         datasets: data.datasets,
-//                         labels: data.labels
-//                     },
-//                     options: {
-//                         responsive: true,
-//                         scales: {
-//                             y: {
-//                                 display: true,
-//                                 ticks: data.y_ticks,
-//                                 title: data.y_label,
-//                                 beginAtZero: true,
-//                             },
-//                             x: {
-//                                 display: true,
-//                                 ticks: data.x_ticks,
-//                                 title: data.x_label,
-//                             }
-
-//                         },
-//                         plugins: {
-//                             title: data.title,
-//                         }
-//                     }
-//                 });
-//             })
-//             .catch(error => console.error('Error fetching data:', error));
 
 fetch(`/admin/DashBoard/api/get_employees/`)
     .then(response => response.json())
@@ -74,7 +41,6 @@ fetch(`/admin/DashBoard/api/get_employees/`)
                     ctx_sum.innerHTML = html
                     const ctx_render = document.getElementById(`summary-${mnv}`)
                         new Chart(ctx_render, {
-                                // type: 'bar',
                             data: {
                                     datasets: data.datasets,
                                     labels: data.labels
@@ -112,7 +78,6 @@ fetch(`/admin/DashBoard/api/get_employees/`)
                     ctx_giolam.innerHTML = html
                     const ctx_render_giolam = document.getElementById(`giolam-${mnv}`)
                         new Chart(ctx_render_giolam, {
-                        // type: 'bar',
                         data: {
                             datasets: data.datasets,
                             labels: data.labels
@@ -149,7 +114,6 @@ fetch(`/admin/DashBoard/api/salary/chart_summary_all/`)
     .then(data => {
         console.log(data)
         new Chart(ctx_sum_all, {
-            // type: 'bar',
             data: {
                 datasets: data.datasets,
                 labels: data.labels
@@ -178,39 +142,6 @@ fetch(`/admin/DashBoard/api/salary/chart_summary_all/`)
     })
     .catch(error => console.error('Error fetching data:', error));
 
-// fetch(`/admin/DashBoard/api/giolam/chart_giolam/sdd003/`)
-//     .then(response => response.json())
-//     .then(data => {
-//         console.log(data)
-//         new Chart(ctx_giolam, {
-//             // type: 'bar',
-//             data: {
-//                 datasets: data.datasets,
-//                 labels: data.labels
-//             },
-//             options: {
-//                 responsive: true,
-//                 scales: {
-//                     y: {
-//                         display: true,
-//                         ticks: data.y_ticks,
-//                         title: data.y_label,
-//                         beginAtZero: true,
-//                     },
-//                     x: {
-//                         display: true,
-//                         ticks: data.x_ticks,
-//                         title: data.x_label,
-//                     }
-
-//                 },
-//                 plugins: {
-//                     title: data.title,
-//                 }
-//             }
-//         });
-//     })
-//     .catch(error => console.error('Error fetching data:', error));
 
 
     fetch(`/admin/DashBoard/api/giolam/chart_giolam_all/`)
@@ -218,7 +149,6 @@ fetch(`/admin/DashBoard/api/salary/chart_summary_all/`)
     .then(data => {
         console.log(data)
         new Chart(ctx_giolam_all, {
-            // type: 'bar',
             data: {
                 datasets: data.datasets,
                 labels: data.labels

@@ -1,6 +1,4 @@
-# from .models import ThongKe
 from Payroll.models import NguoiLD, BangLuong
-# from ImageLabellingTool.models import LabelClass
 from django.http import JsonResponse
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -26,11 +24,9 @@ def getSalary(mnv):
     nguoild = NguoiLD.objects.filter(mnv = mnv).first()
 
     for s in BangLuong.objects.filter(mnv=nguoild):
-        # df['mnv'].append(s.mnv)
-        # print(s.month)
-        df['thang'].append(s.month) #4
-        # print(s.luong)
-        df['luong'].append(s.luong) #1000000
+        df['thang'].append(s.month)
+        df['luong'].append(s.luong)
+
     df = pl.DataFrame(df)
     # print(df)
     # DFSALARY = df
@@ -63,7 +59,6 @@ def chart_summary(request, mnv):
     
     # Get 12 months ago
     now = timezone.now()
-    year = int(now.year)
     months = 12
     start_month = now - relativedelta(months = months) 
     df= df.to_dict(as_series= False)
@@ -74,10 +69,12 @@ def chart_summary(request, mnv):
     
     # truc y: so luong luong theo thang
     data = {}
-    for i in range(len(df['thang'])):
-        month = str(year) + "-" + str(df['thang'][i])
-        luong = df['luong'][i]
-        data[month] = luong
+    for label in labels:
+        year, month = map(int, label.split('-'))
+        if month in df['thang']:
+            index = df['thang'].index(month)
+            data[label] = df['luong'][index]
+        
         
     chart_data= {
         'labels': labels,
@@ -125,11 +122,11 @@ def chart_summary(request, mnv):
         'datasets': [{
                 'label': '{}'.format(mnv),
                 'data': data,
-                'backgroundColor': '#000000',
-                'borderColor': '#000000',
+                'backgroundColor': '#777777',
+                'borderColor': '#777777',
                 'borderWidth': 2,
                 'fill': False,
-                'type': 'line',
+                'type': 'bar',
             }],
     }
     return JsonResponse(chart_data, status=200)
@@ -148,10 +145,9 @@ def chart_summary_all(request):
         mnv = e
         df1 = getSalary(mnv)
         now = timezone.now()
-        year = int(now.year)
         months = 12
         start_month = now - relativedelta(months = months) 
-        d= df1.to_dict(as_series= False)
+        df= df1.to_dict(as_series= False)
         # print(d)
         # chartjs
         # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
@@ -160,23 +156,19 @@ def chart_summary_all(request):
     
         # truc y: so luong luong theo thang
         data = {}
-        for i in range(len(df1['thang'])):
-            month = str(year) + "-" + str(df1['thang'][i])
-            luong = df1['luong'][i]
-            data[month] = luong
-        # print(data)
-            # Thực hiện thống kê lương cho nhân viên hiện tại
-            # Tương tự như trong hàm chart_summary trước đó
+        for label in labels:
+            year, month = map(int, label.split('-'))
+            if month in df['thang']:
+                index = df['thang'].index(month)
+                data[label] = df['luong'][index]
 
-            # Thêm dữ liệu thống kê vào danh sách all_chart_data
         emp_list_data.append({
                 'mnv': mnv,
                 'data': data  
             })
-    # print(emp_list_data[data])
     
     emp_chart_data= {
-        # 'labels' : labels,
+        'labels' : labels,
         'title' : {
             'text': 'Lương của tất cả nhân viên trong 12 tháng gần nhất',
             'display': True,
@@ -221,11 +213,11 @@ def chart_summary_all(request):
         'datasets': [{
                 'label': emp_data['mnv'],
                 'data': emp_data['data'],
-                'backgroundColor': random(), 
-                'borderColor': random(), 
+                'backgroundColor': (color := random()), 
+                'borderColor': color, 
                 'borderWidth': 2,
                 'fill': False,
-                'type': 'line',
+                'type': 'bar',
             } for emp_data in emp_list_data],
     }
     return JsonResponse(emp_chart_data, status=200)
@@ -252,21 +244,21 @@ def chart_giolam(request, mnv):
     df = getGiolam(mnv).clone()
     # Get 12 months ago
     now = timezone.now()
-    year = int(now.year)
     months = 12
     start_month = now - relativedelta(months = months) 
-    d= df.to_dict(as_series= False)
+    df= df.to_dict(as_series= False)
     # chartjs
     # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
     labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
 
     data = {}
-    for i in range(len(df['thang'])):
-        month = str(year) + "-" + str(df['thang'][i])
-        giolam = df['giolam'][i]
-        data[month] = giolam
-        # count = df['count'][i]
-        # data[month] = count
+
+    for label in labels:
+        year, month = map(int, label.split('-'))
+        if month in df['thang']:
+            index = df['thang'].index(month)
+            data[label] = df['giolam'][index]
+
     chart_data= {
         'labels': labels,
         'title': {
@@ -313,11 +305,11 @@ def chart_giolam(request, mnv):
         'datasets': [{
                 'label': '{}'.format(mnv),
                 'data': data,
-                'backgroundColor': '#000000',
-                'borderColor': '#000000',
+                'backgroundColor': '#777777',
+                'borderColor': '#777777',
                 'borderWidth': 2,
                 'fill': False,
-                'type': 'line',
+                'type': 'bar',
             }],
     }
     return JsonResponse(chart_data, status=200)
@@ -333,15 +325,12 @@ def chart_giolam_all(request):
 
     for i in range(len(emp)):
         e=emp[i].mnv
-        # print(e, 'ehjghghgfgdgfchgdgfh')
         mnv = e
         df1 = getGiolam(mnv)#.clone()
-        # print(df1)
         now = timezone.now()
-        year = int(now.year)
         months = 12
         start_month = now - relativedelta(months = months) 
-        d= df1.to_dict(as_series= False)
+        df= df1.to_dict(as_series= False)
         # print(d)
         # chartjs
         # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
@@ -350,23 +339,19 @@ def chart_giolam_all(request):
     
         # truc y: so luong luong theo thang
         data = {}
-        for i in range(len(df1['thang'])):
-            month = str(year) + "-" + str(df1['thang'][i])
-            giolam = df1['giolam'][i]
-            data[month] = giolam
-        # print(data)
-            # Thực hiện thống kê lương cho nhân viên hiện tại
-            # Tương tự như trong hàm chart_summary trước đó
+        for label in labels:
+            year, month = map(int, label.split('-'))
+            if month in df['thang']:
+                index = df['thang'].index(month)
+                data[label] = df['giolam'][index]
 
-            # Thêm dữ liệu thống kê vào danh sách all_chart_data
         emp_list_data.append({
                 'mnv': mnv,
                 'data': data  
             })
-    # print(emp_list_data[data])
     
     emp_chart_data= {
-        # 'labels' : labels,
+        'labels' : labels,
         'title' : {
             'text': 'Thời gian làm việc của tất cả nhân viên trong 12 tháng gần nhất',
             'display': True,
@@ -411,11 +396,11 @@ def chart_giolam_all(request):
         'datasets': [{
                 'label': emp_data['mnv'],
                 'data': emp_data['data'],
-                'backgroundColor': random(), 
-                'borderColor': random(), 
+                'backgroundColor': (color:= random()), 
+                'borderColor': color, 
                 'borderWidth': 2,
                 'fill': False,
-                'type': 'line',
+                'type': 'bar',
             } for emp_data in emp_list_data],
     }
     return JsonResponse(emp_chart_data, status=200)
