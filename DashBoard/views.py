@@ -146,12 +146,12 @@ def chart_summary_all(request):
         df1 = getSalary(mnv)
         now = timezone.now()
         months = 12
-        start_month = now - relativedelta(months = months) 
+        start_month = now - relativedelta(months = 6) 
         df= df1.to_dict(as_series= False)
         # print(d)
         # chartjs
         # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
-        labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
+        labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(6)]
     
     
         # truc y: so luong luong theo thang
@@ -215,9 +215,10 @@ def chart_summary_all(request):
                 'data': emp_data['data'],
                 'backgroundColor': (color := random()), 
                 'borderColor': color, 
-                'borderWidth': 2,
+                'borderWidth': 1,
                 'fill': False,
                 'type': 'bar',
+                'barThickness': 8,
             } for emp_data in emp_list_data],
     }
     return JsonResponse(emp_chart_data, status=200)
@@ -398,7 +399,7 @@ def chart_giolam_all(request):
                 'data': emp_data['data'],
                 'backgroundColor': (color:= random()), 
                 'borderColor': color, 
-                'borderWidth': 2,
+                'borderWidth': 1,
                 'fill': False,
                 'type': 'bar',
             } for emp_data in emp_list_data],
