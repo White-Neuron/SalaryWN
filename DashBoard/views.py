@@ -296,24 +296,73 @@ def getGiolam(mnv):
     LASTGETSALARY = timezone.now()
     return df
 
+def getGiolamForAll():
+    df={
+        'thang': [],
+        'tong_gio': [],
+    }
+    bangluong = BangLuong.objects.all()
+    monthly_gio = {}
+    
+    for salary in bangluong:
+        month = salary.month
+        gio = salary.sogio
+        
+        if month in monthly_gio:
+            monthly_gio[month] += gio
+        else:
+            monthly_gio[month] = gio
+    
+    # Chuyển đổi dictionary thành list để đưa vào DataFrame
+    for month, total_gio in monthly_gio.items():
+        df['thang'].append(month)
+        df['tong_gio'].append(total_gio)
+    
+    # Chuyển đổi dictionary thành DataFrame
+    df = pl.DataFrame(df)
+    
+    return df
+
 def chart_giolam(request, mnv):
-    df = getGiolam(mnv).clone()
-    # Get 12 months ago
-    now = timezone.now()
-    months = 12
-    start_month = now - relativedelta(months = months) 
-    df= df.to_dict(as_series= False)
-    # chartjs
-    # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
-    labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
 
-    data = {}
+    if mnv == 'all':
+        df = getGiolamForAll().clone()
+        now = timezone.now()
+        months = 12
+        start_month = now - relativedelta(months = months) 
+        df= df.to_dict(as_series= False)
+        # chartjs
+        # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
+        labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
+        
+        
+        # truc y: so luong luong theo thang
+        data = {}
+        for label in labels:
+            year, month = map(int, label.split('-'))
+            if month in df['thang']:
+                index = df['thang'].index(month)
+                data[label] = df['tong_gio'][index]
 
-    for label in labels:
-        year, month = map(int, label.split('-'))
-        if month in df['thang']:
-            index = df['thang'].index(month)
-            data[label] = df['giolam'][index]
+    else:
+        df = getGiolam(mnv).clone()
+        # Get 12 months ago
+        now = timezone.now()
+        months = 12
+        start_month = now - relativedelta(months = months) 
+        df= df.to_dict(as_series= False)
+        # chartjs
+        # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
+        labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
+
+        data = {}
+
+        for label in labels:
+            year, month = map(int, label.split('-'))
+            if month in df['thang']:
+                index = df['thang'].index(month)
+                data[label] = df['giolam'][index]
+
 
     chart_data= {
         'labels': labels,
