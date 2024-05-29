@@ -41,6 +41,10 @@ def get_employees(request):
     result= {
         "data": []
     }
+    result['data'].append({
+        'mnv': 'all',
+        'name': 'Tất cả nhân viên',
+    })
     nguoild = NguoiLD.objects.all().values_list('mnv', 'name')
     for (mnv, name) in nguoild:
         result['data'].append({
@@ -48,10 +52,6 @@ def get_employees(request):
             "name": name,
         })
 
-    result['data'].append({
-        'mnv': 'all',
-        'name': 'Tất cả nhân viên',
-    })
     return JsonResponse(result, status=200)
 
 def getSalaryForAll():
