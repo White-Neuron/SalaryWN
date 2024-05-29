@@ -66,13 +66,13 @@ class NguoiLDAdmin(admin.ModelAdmin):
 
 class BangLuongAdmin(admin.ModelAdmin):
     change_form_template = 'admin/nguoild_change_form.html'
-    list_display = ['mnv','cap','sogio', 'month', 'send_button']
-    readonly_fields = ['_cap','luong','qdluong', 'qdbac','bang_luong']
-    list_filter = ['mnv', 'month']
+    list_display = ['mnv','cap','sogio', 'month', 'canhbao_view', 'send_button']
+    readonly_fields = ['_cap','luong', 'qdluong', 'qdbac','bang_luong']
+    list_filter = ['mnv', 'cap', 'month', 'canhbao']
     fieldsets= (
         ("Thông tin lương", {
-            "fields": ["mnv",'_cap', "month", "qdluong", "qdbac", "bang_luong"]
-        }),
+            "fields": ["mnv",'_cap', 'sogio', "month", "qdluong", "qdbac", 'canhbao', "bang_luong"]
+        }), 
     )
     # inlines = [BangLuongInLine]
     actions = ['send_email']
@@ -101,7 +101,7 @@ admin.site.register(BangLuong, BangLuongAdmin)
 
 class GioLamAmin(admin.ModelAdmin):
     list_filter = ['mnv', 'thang']
-    list_display = ['mnv', 'sogio','date', 'thang']
+    list_display = ['mnv', 'sogio','date', 'thang', 'canhbao']
     readonly_fields = ['mnv', 'thang','quyetdinh', 'sogio', 'date']
 
     def has_add_permission(self, request):

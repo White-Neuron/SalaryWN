@@ -12,7 +12,7 @@ class GioLam(models.Model):
     quyetdinh = models.ForeignKey(QuyetDinhLuong, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Quyết định tháng')
     mnv = models.CharField(max_length=10, null=True, blank=True, verbose_name='MNV')
     sogio = models.FloatField(null=True, blank=True, verbose_name='Số giờ làm việc')
-    # sogio = models.FloatField(default=0.0, verbose_name='Số giờ làm việc', null=True, blank=True)
+    canhbao = models.IntegerField(default=0, verbose_name='Cảnh báo', null=True, blank=True)
     date = models.DateField(null=True, blank=True, verbose_name='Ngày làm việc')
 
     def save(self, *args, **kwargs):
@@ -73,13 +73,28 @@ class BangLuong(models.Model):
     month = models.IntegerField(choices=THANG_CHOICE, null=True, blank=True, verbose_name='Lương tháng')
     sogio = models.FloatField(default=0.0, verbose_name='Số giờ làm việc', null=True, blank=True)
     luong = models.IntegerField(null=True, blank=True, verbose_name='Lương')
-    
+    canhbao = models.IntegerField(null=True, blank=True, verbose_name='Cảnh báo')
     qdluong = models.ForeignKey(QuyetDinhLuong, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Quyết định lương')
     qdbac = models.ForeignKey(QuyetDinhTangBac, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Quyết định tăng bậc')
 
     class Meta:
         verbose_name_plural = 'Thông Tin Lương'
 
+    def canhbao_view(self):
+        try:
+            if self.canhbao > 0:
+                canhbao_color= '#FF0000'
+                canhbao = self.canhbao
+            else:
+                canhbao_color= '#000000'
+                canhbao = self.canhbao
+
+            html= f'<span style="color: {canhbao_color};">{canhbao}</span>'
+            return format_html(html)
+        except:
+            return 0
+    canhbao_view.short_description = 'Cảnh báo'
+        
 
     def __str__(self):
         s = "THÁNG " + str(self.month)
