@@ -5,10 +5,9 @@
     {{block.super }}
     <link rel="stylesheet" href="/static/white-neuron-tw.css" />
     <link rel="stylesheet" href="/static/bootstrap-grid.css" />
-    {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" /> {% endcomment %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles_chart.css' %}" />
     
     {% endblock extrastyle %} {% block content_title %}
-    <h1 class="header-title">Thống kê Lương của Nhân Viên</h1>
     {% endblock %}
     {% block content %}
 
@@ -17,9 +16,9 @@
           <div class="col-md-12">
             <div id="select-employee"> </div>
             <div class="chart-module">
-              <p class="text-overview">Salary</p>
               <div id="summary"></div>
-              <p class="text-overview">Salary All</p>
+            </div>
+            <div class="chart-module">
               <canvas class="w-100" id="sumall"></canvas>
             </div>
           </div>

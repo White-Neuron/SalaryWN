@@ -42,6 +42,12 @@ def import_nguoild(request):
         form = ImportNguoiLDForm()
     return render(request, 'admin/import_nguoild_form.html', {'form': form})
 
+def is_number(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
 
 from datetime import datetime
 def import_giolam(request):
@@ -64,10 +70,15 @@ def import_giolam(request):
                     # Trường hợp không có dấu trừ, xử lý bình thường
                     time = datetime.strptime(time_str, '%H:%M:%S')
                     hours = time.hour + time.minute / 60 + time.second / 3600
+                if not is_number(row[7]):
+                    row[7] = 0  
+                else:
+                    row[7] = int(row[7])
                 giolam = GioLam(
                     mnv = row[0],
                     date = row[2],
                     sogio = hours,
+                    canhbao = row[7],
                 )
                 giolam.save()
                 
@@ -75,13 +86,14 @@ def import_giolam(request):
                 luong_list = BangLuong.objects.filter(mnv=nguoild)
                 # time = datetime.strptime(str(giolam.sogio), '%H:%M:%S')
                 # hours = time.hour + time.minute / 60 + time.second / 3600
-            
+                canhbao = int(giolam.canhbao)
                 for luong in luong_list:
                     # tong += hours
                     if not luong.month:
                         luong.month = giolam.thang
                     if luong.month == giolam.thang:
                         luong.sogio += round(hours, 2)
+                        luong.canhbao += canhbao
                         luong.save()
             messages.success(request, 'File đã được import thành công')
             return HttpResponseRedirect(reverse("admin:Payroll_giolam_changelist"))

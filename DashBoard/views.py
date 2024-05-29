@@ -33,6 +33,8 @@ def getSalary(mnv):
     # LASTGETSALARY = timezone.now()
     return df
 
+        
+
 def get_employees(request):
     """ Lấy danh sách người lao động gồm mnv và tên
     """
@@ -45,8 +47,40 @@ def get_employees(request):
             "mnv": mnv,
             "name": name,
         })
+
+    result['data'].append({
+        'mnv': 'all',
+        'name': 'Tất cả nhân viên',
+    })
     return JsonResponse(result, status=200)
 
+def getSalaryForAll():
+    df={
+        'thang': [],
+        'tong_luong': [],
+    }
+    bangluong = BangLuong.objects.all()
+    monthly_salary = {}
+    
+    for salary in bangluong:
+        month = salary.month
+        luong = salary.luong
+        
+        if month in monthly_salary:
+            monthly_salary[month] += luong
+        else:
+            monthly_salary[month] = luong
+    
+    # Chuyển đổi dictionary thành list để đưa vào DataFrame
+    for month, total_salary in monthly_salary.items():
+        df['thang'].append(month)
+        df['tong_luong'].append(total_salary)
+    
+    # Chuyển đổi dictionary thành DataFrame
+    df = pl.DataFrame(df)
+    
+    return df
+        
 
 
 def chart_summary(request, mnv):
@@ -55,31 +89,50 @@ def chart_summary(request, mnv):
     - Trục x: thời gian trong 12 tháng gần nhất
     - Trục y: lương
     """
-    df = getSalary(mnv).clone()
-    
-    # Get 12 months ago
-    now = timezone.now()
-    months = 12
-    start_month = now - relativedelta(months = months) 
-    df= df.to_dict(as_series= False)
-    # chartjs
-    # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
-    labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
-    
-    
-    # truc y: so luong luong theo thang
-    data = {}
-    for label in labels:
-        year, month = map(int, label.split('-'))
-        if month in df['thang']:
-            index = df['thang'].index(month)
-            data[label] = df['luong'][index]
+    if mnv == 'all':
+        df = getSalaryForAll().clone()
+        now = timezone.now()
+        months = 12
+        start_month = now - relativedelta(months = months) 
+        df= df.to_dict(as_series= False)
+        # chartjs
+        # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
+        labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
         
+        
+        # truc y: so luong luong theo thang
+        data = {}
+        for label in labels:
+            year, month = map(int, label.split('-'))
+            if month in df['thang']:
+                index = df['thang'].index(month)
+                data[label] = df['tong_luong'][index]
+    else:
+        df = getSalary(mnv).clone()
+    
+        # Get 12 months ago
+        now = timezone.now()
+        months = 12
+        start_month = now - relativedelta(months = months) 
+        df= df.to_dict(as_series= False)
+        # chartjs
+        # truc x: 12 thang gan nhat, i+1 vi bat dau tu thang hien tai
+        labels = [(start_month + relativedelta(months=i+1)).strftime('%Y-%m') for i in range(months)]
+        
+        
+        # truc y: so luong luong theo thang
+        data = {}
+        for label in labels:
+            year, month = map(int, label.split('-'))
+            if month in df['thang']:
+                index = df['thang'].index(month)
+                data[label] = df['luong'][index]
+            
         
     chart_data= {
         'labels': labels,
         'title': {
-            'text': 'Lương của nhân viên {} trong 12 tháng gần nhất'.format(mnv),
+            'text': 'Lương của {} trong 12 tháng gần nhất'.format(mnv),
             'display': True,
             'color': '#000000',
             'font': { 
@@ -226,6 +279,8 @@ def chart_summary_all(request):
 from random import randint
 def random():
     return "#" + str(randint(100000,999999))
+
+
 
 def getGiolam(mnv):
     df={

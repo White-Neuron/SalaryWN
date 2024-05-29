@@ -39,8 +39,11 @@ odfpy==1.4.1
 openpyxl==3.1.2
 pandas==2.1.4
 parso==0.8.3
+pexpect==4.9.0
 Pillow==10.1.0
+polars==0.20.30
 prompt-toolkit==3.0.43
+ptyprocess==0.7.0
 pure-eval==0.2.2
 pycparser==2.21
 pyexcel==0.7.0
